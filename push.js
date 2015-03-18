@@ -1,5 +1,5 @@
 var fs = require('fs');
-var exec = require('child_process').exec;
+var execSync = require('child_process').execSync;
 var pm2 = require('pm2');
 var mkdirp = require('mkdirp');
 
@@ -11,17 +11,15 @@ var constructor = function() {
 		var curr = body.after;
 		var cloning = body.repository.clone_url;
 		
-		exec('git clone ' + cloning + ' /.swanson/' + curr, function(err) {
-			if(err) {
-				return cb(err);
-			}
-			console.log("CLONED IS DONE");
-			cb(null, '/.swanson/' + curr);
-		});
+		execSync('git clone ' + cloning + ' /.swanson/' + curr);
+		
+		console.log("CLONED IS DONE");
+		cb(null, '/.swanson/' + curr);
 	};
 	
 	this.buildAndTest = function(path, cb) {
-		exec('(cd ' + path + '; npm i; gulp; npm test)', cb); 
+		execSync('(cd ' + path + '; npm i; gulp; npm test)');
+		cb(); 
 	}
 
 	this.killAndRestart = function(pm2Name, clonePath) {
@@ -29,13 +27,8 @@ var constructor = function() {
 		var starter = 'cd ' + clonePath + '; node start.js;';
 		console.log(starter);
 	
-		exec('pm2 delete ' + pm2Name);
-		exec(starter, function(err) {
-			if(err) {
-				throw new Error("Could not restart process");
-			}
-			console.log("-----done");
-		}); 
+		execSync('pm2 delete ' + pm2Name);
+		execSync(starter); 
 	};
 	
 	this.catch = function(req, pm2Name) {
