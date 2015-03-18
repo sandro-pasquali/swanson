@@ -21,16 +21,20 @@ var constructor = function() {
 	};
 	
 	this.buildAndTest = function(path, cb) {
-		console.log(path);
 		exec('(cd ' + path + '; npm i; gulp; npm test)', cb); 
 	}
 
 	this.killAndRestart = function(pm2Name, clonePath) {
+	
+		var starter = 'cd ' + clonePath + '; node start.js;';
+		console.log(starter);
+	
 		exec('pm2 delete ' + pm2Name);
-		exec('cd ' + clonePath + '; node start.js', function(err) {
+		exec(starter, function(err) {
 			if(err) {
 				throw new Error("Could not restart process");
 			}
+			console.log("-----done");
 		}); 
 	};
 	
@@ -39,17 +43,15 @@ var constructor = function() {
 		
 		this.cloneCurrent(req, function(err, clonePath) {
 			if(err) {
-				this.killProcess(pm2Name);
+				throw new Error('Unable to clone');
 			}
 			
-			this.buildAndTest(clonePath, function(err) {
-				if(err) {
-					throw new Error("New repo not production ready!");
-				}
-				
+			this.buildAndTest(clonePath, function() {
+
 				//fs.unlinkSync('swanson.log');
 				
 				this.killAndRestart(pm2Name, clonePath);
+				
 			}.bind(this));
 			
 		}.bind(this));
