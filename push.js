@@ -28,21 +28,12 @@ var constructor = function() {
 	this.killAndRestart = function(pm2Name, clonePath) {
 		pm2.connect(function() {
 			pm2.describe(pm2Name, function(err, list) {
-			
-				var len = list.length;
-				
-				list.forEach(function(obj) {
-					exec('pm2 delete ' + obj.pm_id, function() {
-						if(--len === 0) {
-							console.log('cp -- ', clonePath);
-							exec('(cd ' + clonePath + '; node start.js)', function(err) {
-								if(err) {
-									throw new Error("Could not restart process");
-								}
-							}); 
-						}
-					});
-				});
+				exec('pm2 delete ' + pm2Name);
+				exec('cd ' + clonePath + '; node start.js', function(err) {
+					if(err) {
+						throw new Error("Could not restart process");
+					}
+				}); 
 			});
 		});
 	};
