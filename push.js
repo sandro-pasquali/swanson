@@ -20,7 +20,7 @@ var constructor = function() {
 		});
 	};
 	
-	this.buildAndTest(path) {
+	this.buildAndTest = function(path) {
 		exec('(cd ' + path + '; npm i; gulp; npm test)', function(err) {
 			
 		}); 
