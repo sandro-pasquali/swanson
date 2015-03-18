@@ -1,0 +1,23 @@
+{
+  "name": "swanson",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [
+    "build",
+    "deploy",
+    "webhooks",
+    "github"
+  ],
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sandro Pasquali <spasquali@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "jsop": "^0.3.0",
+    "mkdirp": "^0.5.0",
+    "node-uuid": "^1.4.3",
+    "pm2": "^0.12.8"
+  }
+}
