@@ -58,7 +58,7 @@ var constructor = function() {
 				
 				this.killAndRestart(pm2Name, clonePath);
 			}.bind(this));
-			q
+			
 		}.bind(this));
 	};
 };
