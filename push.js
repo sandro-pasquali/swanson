@@ -15,14 +15,14 @@ var constructor = function() {
 			if(err) {
 				return cb(err);
 			}
-			
+			console.log("CLONED IS DONE");
 			cb(null, './swanson/' + curr);
 		});
 	};
 	
 	this.buildAndTest = function(path) {
 		exec('(cd ' + path + '; npm i; gulp; npm test)', function(err) {
-			
+			console.log("BUILDTEST", err);
 		}); 
 	}
 
