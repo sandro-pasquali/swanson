@@ -16,7 +16,7 @@ var constructor = function() {
 				return cb(err);
 			}
 			console.log("CLONED IS DONE");
-			cb(null, './swanson/' + curr);
+			cb(null, '/.swanson/' + curr);
 		});
 	};
 	
