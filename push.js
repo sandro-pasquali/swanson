@@ -32,7 +32,7 @@ var constructor = function() {
 					exec('pm2 delete ' + obj.pm_id, function() {
 						console.log(obj.pm_id + ' - deleted');
 						fs.unlinkSync('swanson.log');
-						exec('(cd ' + clonePath + '; node start)', function(err) {
+						exec('(cd ' + clonePath + '; node start.js)', function(err) {
 							if(err) {
 								throw new Error("Could not restart process");
 							}
@@ -58,7 +58,7 @@ var constructor = function() {
 				
 				this.killAndRestart(pm2Name, clonePath);
 			}.bind(this));
-			
+			q
 		}.bind(this));
 	};
 };
