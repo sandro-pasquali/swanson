@@ -21,6 +21,7 @@ var constructor = function() {
 	};
 	
 	this.buildAndTest = function(path) {
+		console.log(path);
 		exec('(cd ' + path + '; npm i; gulp; npm test)', function(err) {
 			console.log("BUILDTEST", err);
 		}); 
