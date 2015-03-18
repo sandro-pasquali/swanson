@@ -22,18 +22,21 @@ var constructor = function() {
 	
 	this.buildAndTest = function(path, cb) {
 		console.log(path);
-		exec('(cd ' + path + '; npm i; gulp; npm test)', function(err) {
-			cb(err);
-		}); 
+		exec('(cd ' + path + '; npm i; gulp; npm test)', cb); 
 	}
 
-	this.killAndRestart = function(name) {
+	this.killAndRestart = function(pm2Name, clonePath) {
 		pm2.connect(function() {
 			pm2.describe(pm2Name, function(err, list) {
 				list.forEach(function(obj) {
 					exec('pm2 delete ' + obj.pm_id, function() {
 						console.log(obj.pm_id + ' - deleted');
 						fs.unlinkSync('swanson.log');
+						exec('(cd ' + clonePath + '; node start)', function(err) {
+							if(err) {
+								throw new Error("Could not restart process");
+							}
+						}); 
 					});
 				});
 			});
@@ -53,8 +56,8 @@ var constructor = function() {
 					throw new Error("New repo not production ready!");
 				}
 				
-				this.killAndRestart(pm2Name);
-			});
+				this.killAndRestart(pm2Name, clonePath);
+			}.bind(this));
 			
 		}.bind(this));
 	};
