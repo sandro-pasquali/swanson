@@ -28,15 +28,19 @@ var constructor = function() {
 	this.killAndRestart = function(pm2Name, clonePath) {
 		pm2.connect(function() {
 			pm2.describe(pm2Name, function(err, list) {
+			
+				var len = list.length;
+				
 				list.forEach(function(obj) {
 					exec('pm2 delete ' + obj.pm_id, function() {
-						console.log(obj.pm_id + ' - deleted');
-						fs.unlinkSync('swanson.log');
-						exec('(cd ' + clonePath + '; node start.js)', function(err) {
-							if(err) {
-								throw new Error("Could not restart process");
-							}
-						}); 
+						if(--len === 0) {
+							console.log('cp -- ', clonePath);
+							exec('(cd ' + clonePath + '; node start.js)', function(err) {
+								if(err) {
+									throw new Error("Could not restart process");
+								}
+							}); 
+						}
 					});
 				});
 			});
@@ -55,6 +59,8 @@ var constructor = function() {
 				if(err) {
 					throw new Error("New repo not production ready!");
 				}
+				
+				//fs.unlinkSync('swanson.log');
 				
 				this.killAndRestart(pm2Name, clonePath);
 			}.bind(this));
