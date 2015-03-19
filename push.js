@@ -1,43 +1,29 @@
-var fs = require('fs');
-var execSync = require('child_process').execSync;
-var fork = require('child_process').fork;
-var pm2 = require('pm2');
-var mkdirp = require('mkdirp');
+var exec = require('child_process').exec;
+var bunyan = require('bunyan');
 
+var log = bunyan.createLogger({
+	name: 'autopilot-log',
+	streams: [{
+		path: '/.swanson/output.log',
+		type: 'file'
+	}]
+});
+
+//	0 : before (prev commit hash)
+//	1 : after (curr commit hash)
+//	2 : clone_url
+//	3 : pm2Name
+//
 var args = process.argv.slice(2);
-console.log(args);
 
+log.info("ARGS TO FOLLOW");
+log.info(args);
 
-/*
-var constructor = function() {
+var clonePath = '/.swanson/' + args[1];
+var command = 'git clone ' + args[2] + ' ' + clonePath + ';cd ' + clonePath + '; npm i; gulp; npm test; pm2 delete ' + args[3] + '; npm start';
 
-	this.cloneCurrent = function(req, cb) {
-		var body = req.body;
-		var prev = body.before;
-		var curr = body.after;
-		var cloning = body.repository.clone_url;
-		
-		execSync('git clone ' + cloning + ' /.swanson/' + curr);
-		
-		console.log("CLONED IS DONE");
-		cb(null, '/.swanson/' + curr);
-	};
-	
-	this.restart = function(clonePath, pm2Name) {
-		execSync('cd ' + clonePath + '; npm i; gulp; npm test; pm2 delete ' + pm2Name + '; npm start;');
-	}
-	
-	this.catch = function(req, pm2Name) {
-		this.cloneCurrent(req, function(err, clonePath) {
-			if(err) {
-				throw new Error('Unable to clone');
-			}
-			
-			this.restart(clonePath, pm2Name);
-			
-		}.bind(this));
-	};
-};
+log.info(command);
 
-module.exports = new constructor();
-*/
+exec(command);
+
+log.info('Restart completed');
