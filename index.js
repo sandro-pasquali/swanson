@@ -50,14 +50,16 @@ module.exports = function(app) {
 	var scratch = jsop('./swanson.log');
 	var swansonPath = path.resolve('./node_modules/swanson');
 			
-	if(~script.indexOf('/pm2/')) {
-		return;
-	}
-	
 	app.post('/swanson', swansonHandler.bind({
 		pm2Name : script,
 		push : swansonPath + '/push.js'
-	}));
+	}));			
+			
+	if(~script.indexOf('/pm2/') || scratch[script]) {
+		return;
+	}
+	
+	scratch[script] = new Date().getTime();
 		
 	exec("pm2 start " + script + " --name='" + script + "'", function(err) {
 
