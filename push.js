@@ -18,14 +18,11 @@ var constructor = function() {
 		cb(null, '/.swanson/' + curr);
 	};
 	
-	this.buildAndTest = function(clonePath, pm2Name) {
+	this.restart = function(clonePath, pm2Name) {
 		execSync('cd ' + clonePath + '; npm i; gulp; npm test; pm2 delete ' + pm2Name + '; npm start;');
-		cb(); 
 	}
 	
 	this.catch = function(req, pm2Name) {
-		var body = req.body;
-		
 		this.cloneCurrent(req, function(err, clonePath) {
 			if(err) {
 				throw new Error('Unable to clone');
