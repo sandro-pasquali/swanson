@@ -27,7 +27,7 @@ var constructor = function() {
 		var cmd = 'pm2 delete ' + pm2Name + ';cd ' + clonePath + ';node start.js;';
 		console.log(cmd);
 	
-		exec(cmd);
+		execSync(cmd);
 	};
 	
 	this.catch = function(req, pm2Name) {
