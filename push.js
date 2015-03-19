@@ -25,9 +25,6 @@ var constructor = function() {
 
 	this.killAndRestart = function(pm2Name, clonePath) {
 	
-		var cmd =  + ';cd ' + clonePath + ';node start.js;';
-		console.log(cmd);
-	
 		execSync('pm2 delete ' + pm2Name);
 		fork(clonePath + '/start.js', {
 			cwd: clonePath
