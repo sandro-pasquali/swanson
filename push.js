@@ -4,6 +4,11 @@ var fork = require('child_process').fork;
 var pm2 = require('pm2');
 var mkdirp = require('mkdirp');
 
+var args = process.argv.slice(2);
+console.log(args);
+
+
+/*
 var constructor = function() {
 
 	this.cloneCurrent = function(req, cb) {
@@ -35,3 +40,4 @@ var constructor = function() {
 };
 
 module.exports = new constructor();
+*/

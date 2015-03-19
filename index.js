@@ -1,16 +1,20 @@
 var fs = require('fs');
 var util = require('util');
 var exec = require('child_process').exec;
+var fork = require('child_process').fork;
 var pm2 = require('pm2');
 var uuid = require('node-uuid');
-var jsop = require('jsop');
 var mkdirp = require('mkdirp');
-var push = require('./push');
+var jsop = require('jsop');
 
 function swansonHandler(req, res) {
-	
+
 	if(req.get('X-Github-Event') === "push") {
-		return push.catch(req, this.pm2Name);
+		fork('./push.js', [
+			req.body.before,
+			req.body.after,
+			req.body.repository.clone_url
+		], {});
 	}
 	
 	res.send('ok');
