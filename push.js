@@ -18,18 +18,10 @@ var constructor = function() {
 		cb(null, '/.swanson/' + curr);
 	};
 	
-	this.buildAndTest = function(path, cb) {
-		execSync('(cd ' + path + '; npm i; gulp; npm test)');
+	this.buildAndTest = function(clonePath, pm2Name) {
+		execSync('cd ' + clonePath + '; npm i; gulp; npm test; pm2 delete ' + pm2Name + '; npm start;');
 		cb(); 
 	}
-
-	this.killAndRestart = function(pm2Name, clonePath) {
-	
-		execSync('pm2 delete ' + pm2Name + ';');
-		setTimeout(function() {
-			execSync('pm2 start ' + clonePath + '/start.js --name="' + clonePath + '/start.js"');
-		}, 10000);
-	};
 	
 	this.catch = function(req, pm2Name) {
 		var body = req.body;
@@ -39,13 +31,7 @@ var constructor = function() {
 				throw new Error('Unable to clone');
 			}
 			
-			this.buildAndTest(clonePath, function() {
-
-				//fs.unlinkSync('swanson.log');
-				
-				this.killAndRestart(pm2Name, clonePath);
-				
-			}.bind(this));
+			this.restart(clonePath, pm2Name);
 			
 		}.bind(this));
 	};
