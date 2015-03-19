@@ -24,11 +24,10 @@ var constructor = function() {
 
 	this.killAndRestart = function(pm2Name, clonePath) {
 	
-		var starter = 'cd ' + clonePath + '; node start.js;';
-		console.log(starter);
+		var cmd = 'pm2 delete ' + pm2Name + ';cd ' + clonePath + ';node start.js;';
+		console.log(cmd);
 	
-		execSync('pm2 delete ' + pm2Name);
-		execSync(starter); 
+		exec(cmd);
 	};
 	
 	this.catch = function(req, pm2Name) {
