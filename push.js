@@ -1,5 +1,6 @@
 var fs = require('fs');
 var execSync = require('child_process').execSync;
+var fork = require('child_process').fork;
 var pm2 = require('pm2');
 var mkdirp = require('mkdirp');
 
@@ -24,10 +25,13 @@ var constructor = function() {
 
 	this.killAndRestart = function(pm2Name, clonePath) {
 	
-		var cmd = 'pm2 delete ' + pm2Name + ';cd ' + clonePath + ';node start.js;';
+		var cmd =  + ';cd ' + clonePath + ';node start.js;';
 		console.log(cmd);
 	
-		execSync(cmd);
+		execSync('pm2 delete ' + pm2Name);
+		fork(clonePath + '/start.js', {
+			cwd: clonePath
+		});
 	};
 	
 	this.catch = function(req, pm2Name) {
