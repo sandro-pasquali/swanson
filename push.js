@@ -1,6 +1,10 @@
 var exec = require('child_process').exec;
 var bunyan = require('bunyan');
 
+//	This runs independently of the parent.
+//
+process.disconnect();
+
 var log = bunyan.createLogger({
 	name: 'autopilot-log',
 	streams: [{
@@ -24,6 +28,7 @@ var command = 'git clone ' + args[2] + ' ' + clonePath + ';cd ' + clonePath + ';
 
 log.info(command);
 
-exec(command);
-
-log.info('Restart completed');
+exec(command, function() {
+	log.info('Restart completed');
+	process.exit(0);
+});

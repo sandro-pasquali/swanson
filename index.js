@@ -20,7 +20,6 @@ var log = bunyan.createLogger({
 
 function swansonHandler(req, res) {
 	if(req.get('X-Github-Event') === "push") {
-		log.info('======' + this.push);
 		fork(this.push, [
 			req.body.before,
 			req.body.after,
@@ -50,22 +49,16 @@ module.exports = function(app) {
 
 	var scratch = jsop('./swanson.log');
 	var swansonPath = path.resolve('./node_modules/swanson');
-	
-	if(!scratch.bound) {
-		app.post('/swanson', swansonHandler.bind({
-			pm2Name : script,
-			push : swansonPath + '/push.js'
-		}));
-	}
-	
-	scratch.bound = new Date().getTime();
-	
-	if(~script.indexOf('/pm2/') || scratch[script]) {
+			
+	if(~script.indexOf('/pm2/')) {
 		return;
 	}
 	
-	scratch[script] = new Date().getTime();
-	
+	app.post('/swanson', swansonHandler.bind({
+		pm2Name : script,
+		push : swansonPath + '/push.js'
+	}));
+		
 	exec("pm2 start " + script + " --name='" + script + "'", function(err) {
 
 		if(err) {
