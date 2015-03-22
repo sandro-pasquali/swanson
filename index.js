@@ -20,9 +20,10 @@ var log = bunyan.createLogger({
 
 function swansonHandler(req, res) {
 	var swansonPath = path.resolve('./node_modules/swanson');
+	log.info("Swansonpath: " + swansonPath);
 	if(req.get('X-Github-Event') === "push") {
 		var cwd = '/.swanson/' + req.body.after;
-		fork(swansonPath + '/path.js', [
+		fork(swansonPath + '/push.js', [
 			cwd,
 			req.body.repository.clone_url,
 			this.pm2Name
