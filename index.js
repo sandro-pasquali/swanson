@@ -20,11 +20,25 @@ var log = bunyan.createLogger({
 
 function swansonHandler(req, res, pm2Name) {
 	var swansonPath = path.resolve('./node_modules/swanson');
+
+	var changes = {
+		added : [],
+		removed : [],
+		modified : []
+	};
+	
+	req.body.commits.forEach(function(obj) {
+		changes.removed = changes.removed.concat(obj.removed);
+		changes.modified = changes.modified.concat(obj.modified);
+		changes.added = changes.added.concat(obj.added);
+	});
+	
 	if(req.get('X-Github-Event') == "push") {
 		fork(swansonPath + '/push.js', [
 			'/.swanson/' + req.body.after,
 			req.body.repository.clone_url,
-			pm2Name
+			pm2Name,
+			changes
 		]);
 	}
 	
