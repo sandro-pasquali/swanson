@@ -18,18 +18,14 @@ var log = bunyan.createLogger({
 	}]
 });
 
-function swansonHandler(req, res) {
+function swansonHandler(req, res, pm2Name) {
 	var swansonPath = path.resolve('./node_modules/swanson');
-	log.info("Swansonpath: " + swansonPath);
-	if(req.get('X-Github-Event') === "push") {
-		var cwd = '/.swanson/' + req.body.after;
+	if(req.get('X-Github-Event') == "push") {
 		fork(swansonPath + '/push.js', [
-			cwd,
+			'/.swanson/' + req.body.after,
 			req.body.repository.clone_url,
-			this.pm2Name
-		], {
-			cwd: cwd
-		});
+			pm2Name
+		]);
 	}
 	
 	res.send('ok');
@@ -53,9 +49,9 @@ module.exports = function(app) {
 
 	var scratch = jsop('./swanson.log');
 			
-	app.post('/swanson', swansonHandler.bind({
-		pm2Name : script
-	}));			
+	app.post('/swanson', function(req, res) {
+		swansonHandler(req, res, script);
+	});			
 			
 	if(~script.indexOf('/pm2/') || scratch[script]) {
 		return;

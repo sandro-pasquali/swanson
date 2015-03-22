@@ -1,9 +1,7 @@
+var path = require('path');
 var exec = require('child_process').exec;
-var npm = require('npm');
 var bunyan = require('bunyan');
 
-//	This runs independently of the parent.
-//
 process.disconnect();
 
 var log = bunyan.createLogger({
@@ -20,19 +18,13 @@ var log = bunyan.createLogger({
 //
 var args = process.argv.slice(2);
 
-log.info("ARGS TO FOLLOW");
-log.info(args);
+var sourceDir = path.dirname(args[2]);
+var buildDir = args[0];
 
+var command = 'git clone ' + args[1] + ' ' + buildDir + ';cd ' + buildDir + ';npm i; gulp;npm test; rm -rf ' + sourceDir + '; mv ' + buildDir + ' ' + sourceDir + ';pm2 restart ' + args[2];
 
-var build = 'gulp; npm test;  npm start';
-
-log.info(command);
-
-exec('git clone ' + args[1] + ' ' + args[0] + ';npm i; gulp; npm test; pm2 delete ' + args[2], function() {
-	npm.load(function(err) {
-		npm.commands.start(function (err, data) {
-			log.info('Restart completed');
-			process.exit(0);
-		});
-	});
+exec(command, function() {
+	log.info('restart complete');
+	process.exit(0);
 });
+
