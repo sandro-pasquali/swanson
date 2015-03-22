@@ -12,11 +12,6 @@ var log = bunyan.createLogger({
 	}]
 });
 
-//	0 : clone_path
-//	1 : clone_url
-//	2 : pm2Name
-//	3 : commit data
-//
 var args = process.argv.slice(2);
 
 //	The github repo clone url
@@ -24,6 +19,7 @@ var args = process.argv.slice(2);
 var cloneUrl = args[1];
 
 //	The pm2 process name; === to the npm main file (the entry point for repo)
+//
 var pm2Name = args[2];
 
 //	The directory of the repo that is being watched
@@ -46,7 +42,9 @@ function enterAndBuild(cb) {
 	exec('cd ' + buildDir + ';npm i; gulp;npm test', cb);
 }
 
-//	Run through the buildDir and move all files/folders that 
+//	Run through the buildDir and move all files/folders that have
+//	changed, restarting pm2 instance at the end.
+//
 function moveAndRestart(cb) {
 
 	var removing = commits.removed;
@@ -78,23 +76,21 @@ function moveAndRestart(cb) {
 	//
 	removeCommands.length && command.push(removeCommands.join(';'));
 	addCommands.length && command.push(addCommands.join(';'));
+	
+	//	We always move the /build folder
+	//
+	command.push('rm -rf ' + sourceDir + '/build; mv ' + buildDir + '/build ' + sourceDir + '/build');
+	
+	//	Restart the deployed repo
+	//
 	command.push('pm2 restart ' + pm2Name);
 	command = command.join(';');
-	
-	console.log(command);
-	
-	//exec(command, cb);
+
+	exec(command, cb);
 }
 
-		moveAndRestart(function(err) {
-			if(err) {
-				return log.error(err);
-			}
-			console.log("OK!!!!!!!!!");
-		});
-
-/*
-
+//	The action -- clone, build, move, restart
+//
 cloneRepo(function(err) {
 	if(err) {
 		//	do some more here
@@ -112,14 +108,3 @@ cloneRepo(function(err) {
 		});
 	});
 });
-
-*/
-
-/*
-var command = 'git clone ' + args[1] + ' ' + buildDir + ';cd ' + buildDir + ';npm i; gulp;npm test; rm -rf ' + sourceDir + '/build; mv ' + buildDir + '/build ' + sourceDir + ';pm2 restart ' + args[2];
-
-exec(command, function() {
-	log.info('restart complete');
-	process.exit(0);
-});
-*/
