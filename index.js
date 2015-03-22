@@ -38,7 +38,7 @@ function swansonHandler(req, res, pm2Name) {
 			'/.swanson/' + req.body.after,
 			req.body.repository.clone_url,
 			pm2Name,
-			changes
+			JSON.stringify(changes)
 		]);
 	}
 	

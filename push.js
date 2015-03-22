@@ -36,7 +36,7 @@ var buildDir = args[0];
 
 //	What was removed, modified or added
 //
-var commits = args[3];
+var commits = JSON.parse(args[3]);
 
 function cloneRepo(cb) {
 	exec('git clone ' + cloneUrl + ' ' + buildDir, cb);
@@ -48,6 +48,7 @@ function enterAndBuild(cb) {
 
 //	Run through the buildDir and move all files/folders that 
 function moveAndRestart(cb) {
+
 	var removing = commits.removed;
 	//	Both modified and added
 	//
@@ -55,8 +56,11 @@ function moveAndRestart(cb) {
 	
 	var removeCommands = [];
 	var addCommands = [];
-	var command;
+	var command = [];
 	
+	//	remove commands are simple rm's
+	//	add || modify we rm from source, and replace with newly built files
+	//
 	removing.forEach(function(f) {
 		removeCommands.push(
 			'rm -rf ' + sourceDir + '/' + f
@@ -66,20 +70,50 @@ function moveAndRestart(cb) {
 	adding.forEach(function(f) {
 		addCommands.push(
 			'rm -rf ' + sourceDir + '/' + f,
-			'mv ' + buildDir + '/' + f + ' ' + sourceDir + '/' + f;
+			'mv ' + buildDir + '/' + f + ' ' + sourceDir + '/' + f
 		);
 	});
 	
-	command = [
-		removeCommands.join(';'), 
-		addCommands.join(';'),
-		'pm2 restart ' + pm2Name
-	].join(';');
+	//	Just creating a long string of ;-separated commands for #exec
+	//
+	removeCommands.length && command.push(removeCommands.join(';'));
+	addCommands.length && command.push(addCommands.join(';'));
+	command.push('pm2 restart ' + pm2Name);
+	command = command.join(';');
 	
 	console.log(command);
 	
 	//exec(command, cb);
 }
+
+		moveAndRestart(function(err) {
+			if(err) {
+				return log.error(err);
+			}
+			console.log("OK!!!!!!!!!");
+		});
+
+/*
+
+cloneRepo(function(err) {
+	if(err) {
+		//	do some more here
+		return log.error(err);
+	}
+	enterAndBuild(function(err, data) {
+		if(err) {
+			return log.error(err);
+		}
+		moveAndRestart(function(err) {
+			if(err) {
+				return log.error(err);
+			}
+			console.log("OK!!!!!!!!!");
+		});
+	});
+});
+
+*/
 
 /*
 var command = 'git clone ' + args[1] + ' ' + buildDir + ';cd ' + buildDir + ';npm i; gulp;npm test; rm -rf ' + sourceDir + '/build; mv ' + buildDir + '/build ' + sourceDir + ';pm2 restart ' + args[2];
@@ -89,7 +123,3 @@ exec(command, function() {
 	process.exit(0);
 });
 */
-
-moveAndRestart(function(err, data) {
-	console.log('done');
-});
