@@ -5,7 +5,7 @@ var bunyan = require('bunyan');
 process.disconnect();
 
 var log = bunyan.createLogger({
-	name: 'autopilot-log',
+	name: 'swanson-log',
 	streams: [{
 		path: '/.swanson/output.log',
 		type: 'file'
